@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>T14 Law School Admissions Predictor</title>
+    <link href="https://fonts.googleapis.com/css2?family=Spectral:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Spectral', serif;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            background-color: #f0f4f8;
+            color: #333;
+        }
+        .container {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            max-width: 100%;
+            width: 100%;
+            margin-bottom: 20px;
+            box-sizing: border-box;
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 24px;
+            color: #003366;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #003366;
+        }
+        input[type="text"],
+        input[type="number"],
+        select {
+            width: calc(100% - 24px);
+            padding: 12px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-sizing: border-box;
+            font-size: 14px;
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #003366;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #001f4d;
+        }
+        .result {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 18px;
+            color: #003366;
+        }
+        .disclaimer {
+            margin-top: 20px;
+            font-size: 12px;
+            color: #777;
+            text-align: center;
+        }
+        .explanation {
+            font-size: 14px;
+            color: #555;
+            margin-top: 10px;
+        }
+        .color-explanation {
+            margin-top: 20px;
+            font-size: 14px;
+            color: #555;
+        }
+        .color-box {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            margin-right: 8px;
+            border-radius: 3px;
+        }
+        .green { background-color: green; }
+        .yellow { background-color: yellow; }
+        .orange { background-color: orange; }
+        .red { background-color: red; }
+        .light-green { background-color: lightgreen; }
+        a {
+            color: #003366;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+        }
+        th {
+            cursor: pointer;
+            background-color: #f2f2f2;
+            color: #003366;
+        }
+        th:hover {
+            background-color: #ddd;
+        }
+        .tooltip {
+            position: relative;
+            display: inline-block;
+            cursor: pointer;
+        }
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 850px;
+            background-color: #555;
+            color: #fff;
+            text-align: left;
+            border-radius: 6px;
+            padding: 10px;
+            position: absolute;
+            z-index: 1;
+            bottom: 150%; /* Position above the icon */
+            left: 50%;
+            margin-left: -320px; /* Center the tooltip */
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-size: 11px;
+            display: flex;
+            justify-content: space-between;
+        }
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+            opacity: 1;
+        }
+        .tooltip ul {
+            list-style-type: none;
+            padding: 0;
+            margin: 0 10px;
+        }
+        .tooltip h3 {
+            margin-top: 0;
+        }
+
+        @media (min-width: 600px) {
+            .container {
+                max-width: 600px;
+                padding: 30px;
+            }
+            h1 {
+                font-size: 32px;
+            }
+            input[type="text"],
+            input[type="number"],
+            select {
+                width: calc(100% - 20px);
+                font-size: 16px;
+            }
+            button {
+                font-size: 18px;
+            }
+            .result {
+                font-size: 20px;
+            }
+            .explanation {
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>T14 Law School Admissions Predictor</h1>
+
+        <label for="lsat">LSAT Score:</label>
+        <input type="number" id="lsat" min="120" max="180" required>
+
+        <label for="gpa">GPA:</label>
+        <input type="number" step="0.01" id="gpa" min="0" max="4.33" required>
+
+        <label for="international">International Student:</label>
+        <select id="international">
+            <option value="0">No</option>
+            <option value="1">Yes</option>
+        </select>
+
+        <label for="urm">Under-Represented Minority (URM):</label>
+        <select id="urm">
+            <option value="0">No</option>
+            <option value="1">Yes</option>
+        </select>
+
+       <label for="softs">Softs:
+    <span class="tooltip">?
+        <span class="tooltiptext">
+            <div>
+                <h3>[Extremely Rare]</h3>
+                <ul>
+                    <li>Top military honors (e.g., Medal of Honor)</li><br>
+                    <li>Rhodes Scholar</li><br>
+                    <li>Founder of a multimillion-dollar company</li><br>
+                    <li>Fortune 500 C-level executive</li><br>
+                    <li>Professional or near-professional athlete</li><br>
+                    <li>Highly published author or cited academic</li>
+                </ul>
+            </div>
+            <div>
+                <h3>[Rare]</h3>
+                <ul>
+                    <li>Notable military awards (e.g., Purple Heart)</li><br>
+                    <li>Prestigious scholarship recipient (e.g., Fulbright, Schwarzman, Truman, Gates)</li><br>
+                    <li>Exceptional NCAA athlete</li><br>
+                    <li>Overcame major physical/mental challenges</li><br>
+                    <li>Senior position in previous employment</li><br>
+                    <li>Significant expertise (e.g., patents)</li>
+                </ul>
+            </div>
+            <div>
+                <h3>[Uncommon]</h3>
+                <ul>
+                    <li>Commissioned military officer</li><br>
+                    <li>Prestigious undergraduate awards</li><br>
+                    <li>NCAA athlete</li><br>
+                    <li>Overcame substantial adversity</li><br>
+                    <li>Published academic</li><br>
+                    <li>Service in public organizations (e.g., Peace Corps)</li><br>
+                    <li>Relevant prior employment</li><br>
+                    <li>Disadvantaged status (e.g., LGBTQ+, first-generation college student)</li>
+                </ul>
+            </div>
+            <div>
+                <h3>[Common]</h3>
+                <ul>
+                    <li>Any military service</li><br>
+                    <li>Legal/congressional internships</li><br>
+                    <li>Leadership in clubs/organizations</li><br>
+                    <li>Participation in school publications</li><br>
+                    <li>Honor society membership</li>
+                </ul>
+            </div>
+        </span>
+    </span>
+</label>
+        <select id="softs">
+            <option value="0">Common</option>
+            <option value="1">Uncommon</option>
+            <option value="2">Rare</option>
+            <option value="3">Extremely Rare</option>
+        </select>
+
+        <button onclick="calculateProbability()">Calculate Probability</button>
+        <div class="result" id="result"></div>
+    </div>
+
+    <div class="container color-explanation">
+        <h2>Color Explanation</h2>
+        <p><span class="color-box light-green"></span>Mint: Super-Safe School (<em>Though likely be waitlisted due to yield protection</em>)</p>
+        <p><span class="color-box green"></span>Green: Safe School</p>
+        <p><span class="color-box yellow"></span>Yellow: Target School</p>
+        <p><span class="color-box orange"></span>Orange: Reach School</p>
+        <p><span class="color-box red"></span>Red: Super-Reach School</p>
+    </div>
+    
+    <div class="container explanation">
+        <h2>Explanation of Model Performance Metrics</h2>
+        <p><strong>Accuracy:</strong> The proportion of correctly classified instances. It is a measure of how often the model is correct. A higher accuracy indicates a better model.</p>
+        <p><strong>AUC (Area Under the Curve):</strong> The area under the ROC (Receiver Operating Characteristic) curve. It measures the ability of the model to distinguish between positive and negative classes. An AUC of 0.5 indicates no discriminative power, while an AUC of 1.0 indicates perfect classification.</p>
+        <p><strong>Interpreting AUC:</strong></p>
+        <ul>
+            <li>0.5 &lt; AUC &lt; 0.7: Poor model performance.</li>
+            <li>0.7 &le; AUC &lt; 0.8: Fair performance.</li>
+            <li>0.8 &le; AUC &lt; 0.9: Good performance.</li>
+            <li>0.9 &le; AUC &lt; 1.0: Excellent performance.</li>
+        </ul>
+    </div>
+
+    <div class="disclaimer">
+        <!-- <br>
+        Please note that the estimated chances do not indicate that you personally have a specific percentage chance (e.g., 50%) <br>
+        of getting into a particular school. Instead, they reflect statistical data showing that a certain percentage (e.g., 50%) <br>
+        of past applicants who had the same GPA and LSAT scores (or other similar qualifications) as you were accepted into that school.<br>
+        <br> -->
+        Data source: <a href="https://www.lsd.law/download" target="_blank">https://www.lsd.law/download</a><br>
+        Models were built based on data from the 2019-2023 cycles.<br>
+        Developed by Frederick Liu. Last updated: 6/15/2024.
+    </div>
+
+    <script>
+        function calculateProbability() {
+            const lsat = parseFloat(document.getElementById('lsat').value);
+            const gpa = parseFloat(document.getElementById('gpa').value);
+            const international = parseInt(document.getElementById('international').value);
+            const urm = parseInt(document.getElementById('urm').value);
+            const softs = parseInt(document.getElementById('softs').value);
+
+            if (isNaN(lsat) || isNaN(gpa)) {
+                alert("Please enter both LSAT and GPA values.");
+                return;
+            }
+
+            if (lsat > 180 || lsat < 120) {
+                alert("LSAT score must be between 120 and 180.");
+                return;
+            }
+
+            if (gpa > 4.33 || gpa < 0) {
+                alert("GPA must be between 0 and 4.33.");
+                return;
+            }
+
+            const schools = {
+                yale: { name: "Yale University", beta_lsat: 0.291, beta_gpa: 7.329, beta_international: -1.011, beta_urm: 2.110, beta_softsT1: 2.482, beta_softsT2: 1.674, beta_softsT3: 0.185, beta_softsT4: -0.613, beta_0: -81.638, accuracy: 91.67, auc: 92.37 },
+                stanford: { name: "Stanford University", beta_lsat: 0.262, beta_gpa: 6.455, beta_international: -0.376, beta_urm: 2.280, beta_softsT1: 0.469, beta_softsT2: 0.712, beta_softsT3: -0.627, beta_softsT4: -1.353, beta_0: -71.514, accuracy: 87.14, auc: 92.11 },
+                harvard: { name: "Harvard University", beta_lsat: 0.258, beta_gpa: 5.922, beta_international: -1.192, beta_urm: 1.136, beta_softsT1: 1.223, beta_softsT2: 0.714, beta_softsT3: -0.015, beta_softsT4: -0.530, beta_0: -69.033, accuracy: 85.71, auc: 84.62 },
+                chicago: { name: "University of Chicago", beta_lsat: 0.353, beta_gpa: 8.949, beta_international: -1.879, beta_urm: 3.269, beta_softsT1: -0.996, beta_softsT2: -0.112, beta_softsT3: -0.274, beta_softsT4: -0.749, beta_0: -95.183, accuracy: 89.96, auc: 94.45 },
+                columbia: { name: "Columbia University", beta_lsat: 0.379, beta_gpa: 10.205, beta_international: -0.501, beta_urm: 2.977, beta_softsT1: 0.673, beta_softsT2: 0.872, beta_softsT3: 0.558, beta_softsT4: -0.008, beta_0: -104.497, accuracy: 89.59, auc: 94.60 },
+                penn: { name: "University of Pennsylvania", beta_lsat: 0.358, beta_gpa: 5.881, beta_international: -1.730, beta_urm: 1.973, beta_softsT1: 1.412, beta_softsT2: 0.578, beta_softsT3: 0.170, beta_softsT4: -0.314, beta_0: -83.985, accuracy: 84.31, auc: 90.42 },
+                nyu: { name: "New York University", beta_lsat: 0.427, beta_gpa: 9.490, beta_international: -1.529, beta_urm: 2.266, beta_softsT1: 3.556, beta_softsT2: 0.553, beta_softsT3: 0.168, beta_softsT4: -0.052, beta_0: -109.433, accuracy: 89.84, auc: 95.46 },
+                duke: { name: "Duke University", beta_lsat: 0.374, beta_gpa: 7.454, beta_international: -0.991, beta_urm: 1.863, beta_softsT1: -1.040, beta_softsT2: 0.746, beta_softsT3: 0.249, beta_softsT4: -0.252, beta_0: -92.072, accuracy: 85.21, auc: 89.41 },
+                berk: { name: "University of California, Berkeley", beta_lsat: 0.254, beta_gpa: 5.793, beta_international: -1.130, beta_urm: 1.167, beta_softsT1: 1.845, beta_softsT2: 0.270, beta_softsT3: -0.411, beta_softsT4: -1.051, beta_0: -65.437, accuracy: 79.23, auc: 87.49 },
+                virginia: { name: "University of Virginia", beta_lsat: 0.256, beta_gpa: 4.279, beta_international: -2.426, beta_urm: 1.685, beta_softsT1: 0.687, beta_softsT2: 0.023, beta_softsT3: 0.067, beta_softsT4: -0.678, beta_0: -59.849, accuracy: 81.99, auc: 88.90 },
+                michigan: { name: "University of Michigan", beta_lsat: 0.199, beta_gpa: 3.262, beta_international: -2.983, beta_urm: 1.843, beta_softsT1: -0.802, beta_softsT2: 0.695, beta_softsT3: 0.266, beta_softsT4: -0.238, beta_0: -46.778, accuracy: 72.55, auc: 81.62 },
+                northwestern: { name: "Northwestern University", beta_lsat: 0.429, beta_gpa: 5.727, beta_international: -1.020, beta_urm: 2.755, beta_softsT1: -0.146, beta_softsT2: 0.362, beta_softsT3: -0.006, beta_softsT4: -0.183, beta_0: -94.234, accuracy: 84.59, auc: 92.67 },
+                cornell: { name: "Cornell University", beta_lsat: 0.397, beta_gpa: 5.905, beta_international: 0.147, beta_urm: 2.300, beta_softsT1: -0.805, beta_softsT2: -0.013, beta_softsT3: 0.198, beta_softsT4: 0.194, beta_0: -90.784, accuracy: 88.82, auc: 92.24 },
+                georgetown: { name: "Georgetown University", beta_lsat: 0.484, beta_gpa: 6.542, beta_international: -0.298, beta_urm: 2.512, beta_softsT1: 16.395, beta_softsT2: 0.673, beta_softsT3: -0.685, beta_softsT4: -0.995, beta_0: -105.544, accuracy: 85.07, auc: 93.66 }
+            };
+
+            let results = [];
+
+            for (const [school, params] of Object.entries(schools)) {
+                const logit_p = params.beta_0 + (params.beta_lsat * lsat) + (params.beta_gpa * gpa) +
+                                (params.beta_international * international) + (params.beta_urm * urm) +
+                                (params.beta_softsT1 * (softs === 3 ? 1 : 0)) +
+                                (params.beta_softsT2 * (softs === 2 ? 1 : 0)) +
+                                (params.beta_softsT3 * (softs === 1 ? 1 : 0)) +
+                                (params.beta_softsT4 * (softs === 0 ? 1 : 0));
+
+                const probability = 1 / (1 + Math.exp(-logit_p));
+
+                results.push({ school: params.name, probability: Math.round(probability * 100), accuracy: Math.round(params.accuracy), auc: Math.round(params.auc) });
+            }
+
+            displayResults(results);
+        }
+
+        function displayResults(results) {
+            let resultHTML = '<h3>Results</h3>';
+            resultHTML += '<table><tr><th onclick="sortTable(0)">School</th><th onclick="sortTable(1)">Probability</th><th onclick="sortTable(2)">Accuracy</th><th onclick="sortTable(3)">AUC</th></tr>';
+
+            results.forEach(result => {
+                const probability = result.probability;
+                let color = '';
+
+                if (probability > 90) {
+                    color = 'lightgreen';
+                } else if (probability > 70 && probability <= 90) {
+                    color = 'green';
+                } else if (probability >= 40 && probability <= 70) {
+                    color = 'yellow';
+                } else if (probability >= 20 && probability < 40) {
+                    color = 'orange';
+                } else {
+                    color = 'red';
+                }
+
+                resultHTML += `<tr><td>${result.school}</td>
+                               <td style="background-color: ${color};">${result.probability}%</td>
+                               <td>${result.accuracy}%</td>
+                               <td>${result.auc}%</td></tr>`;
+            });
+
+            resultHTML += '</table>';
+            document.getElementById('result').innerHTML = resultHTML;
+        }
+
+        function sortTable(columnIndex) {
+            const table = document.querySelector('table');
+            const rows = Array.from(table.rows).slice(1);
+
+            let sortedRows;
+            if (columnIndex === 1 || columnIndex === 2 || columnIndex === 3) { // Sort by Probability, Accuracy, or AUC
+                sortedRows = rows.sort((a, b) => parseFloat(a.cells[columnIndex].innerText.replace('', '')) - parseFloat(b.cells[columnIndex].innerText.replace('', '')));
+            } else {
+                sortedRows = rows.sort((a, b) => a.cells[columnIndex].innerText.localeCompare(b.cells[columnIndex].innerText));
+            }
+
+            if (this.sorted && this.sorted.columnIndex === columnIndex) {
+                sortedRows.reverse();
+                this.sorted.ascending = !this.sorted.ascending;
+            } else {
+                this.sorted = { columnIndex, ascending: true };
+            }
+
+            table.tBodies[0].append(...sortedRows);
+        }
+    </script>
+</body>
+</html>
